@@ -1,0 +1,1 @@
+{"name": "Python 3 & Node.js", "dockerComposeFile": "docker-compose.yml", "features": {"ghcr.io/devcontainers/features/python:1": {}}, "customizations": {"vscode": {"extensions": ["ms-python.python"]}}}
