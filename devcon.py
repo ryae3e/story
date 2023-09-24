@@ -1,63 +1,51 @@
 import os
 import json
 
-# Folder paths 
-DEVCONTAINER_FOLDER = '.devcontainer'
+# Folder paths
+DOCKER_FOLDER = '.docker'
 DOCKER_COMPOSE_FILE = 'docker-compose.yml'
 DOCKERFILE = 'Dockerfile'
+REQUIREMENTS_FILE = 'requirements-dev.txt'
 
-# devcontainer.json contents
-devcontainer_config = {
-  "name": "Python 3 & Node.js",
+# Create .docker folder
+os.mkdir(DOCKER_FOLDER)
 
-  "dockerComposeFile": DOCKER_COMPOSE_FILE,
-
-  "features": {
-    "ghcr.io/devcontainers/features/python:1": {}
-  },
-
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-python.python" 
-      ]
-    }
-  }
-}
-
-# docker-compose.yml contents
+# Create docker-compose.yml
 docker_compose_config = '''
+version: '3'
+
 services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile  
+      dockerfile: Dockerfile
 '''
-
-# Dockerfile contents
-dockerfile_config = '''
-FROM python:3.8
-
-# Install nodejs
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \\
-    && apt install -y nodejs
-    
-# Install python packages etc    
-'''
-
-# Create .devcontainer folder
-os.mkdir(DEVCONTAINER_FOLDER)
-
-# Create devcontainer.json
-with open(os.path.join(DEVCONTAINER_FOLDER, 'devcontainer.json'), 'w') as f:
-    json.dump(devcontainer_config, f)
-    
-# Create docker-compose.yml    
-with open(os.path.join(DEVCONTAINER_FOLDER, DOCKER_COMPOSE_FILE), 'w') as f:
+with open(os.path.join(DOCKER_FOLDER, DOCKER_COMPOSE_FILE), 'w') as f:
     f.write(docker_compose_config)
 
 # Create Dockerfile
-with open(os.path.join(DEVCONTAINER_FOLDER, DOCKERFILE), 'w') as f: 
+dockerfile_config = '''
+FROM python:3.9
+
+# Set working directory
+WORKDIR /app
+
+# Copy app files
+COPY . .
+
+# Install any dependencies or packages required for development
+RUN pip install -r requirements-dev.txt
+
+# Set entrypoint
+CMD ["python", "app.py"]
+'''
+with open(os.path.join(DOCKER_FOLDER, DOCKERFILE), 'w') as f:
     f.write(dockerfile_config)
 
-print("Devcontainer configuration created!")
+# Create requirements-dev.txt
+with open(os.path.join(DOCKER_FOLDER, REQUIREMENTS_FILE), 'w') as f:
+    # Write any development dependencies required
+    f.write('')
+
+# Print success message
+print("Docker configuration created!")
